@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Metadatos -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Links CDN -->
+    
+
+    <title>{% block title %}  {% endblock %}</title>
+</head>
+<body>
+    <!-- Encabezado principal -->
+    <header>
+        {% if user.is_authenticated %}
+            <span>Hola, {{ user.username }}👋</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Cerrar sesión</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Iniciar sesión</a>
+            <a href="{% url 'signup' %}">Registrarse</a>
+        {% endif %}
+    </header>
+
+    <!-- Cuerpo -->
+    <main>
+        {% block content %}
+        <!-- AGUANTE LA COCA COLA -->
+        {% endblock %}
+    </main>
+</body>
+</html>
