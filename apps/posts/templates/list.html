@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %} 
+
+{% if request.user.is_authenticated and request.user.profile.is_editor %}
+  <a href="{% url 'posts:post_create' %}">Crear nuevo post</a>
+{% endif %}
+
+<section>
+    {% for post in posts %}
+
+        <article>
+            <h2>{{ post.title }}</h2>
+            <br>
+            <p>Autor: {{ post.author.username }}</p>
+            <p>Publicado: {{ post.creation_date|date:"d M Y" }}</p>
+            <br>
+            <p>{{ post.abstract }}</p>
+            <a href="#">Leer más</a>
+        </article>
+        <hr>
+    {% empty %}
+        <p>No se encontraron publicaciones.</p>    
+    {% endfor %}
+</section>
+
+{% if is_paginated %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+
+{% endblock %}

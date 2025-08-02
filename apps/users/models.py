@@ -9,5 +9,8 @@ class Profile(models.Model):
         ('reader', 'Reader'),
     ], default='reader')
 
+    def is_editor(self):
+        return self.rol == "editor"
+
     def __str__(self):
         return f'{self.user.username} - {self.rol}'

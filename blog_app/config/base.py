@@ -39,6 +39,7 @@ SECOND_APPS = [
     # Apps personalizadas
     'apps.userauth',
     'apps.users',
+    'apps.posts',
 ]
 
 THIRD_APPS = [
