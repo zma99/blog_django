@@ -1,0 +1,32 @@
+# Archivos y carpetas de compilación
+__pycache__/
+*.py[cod]
+*.so
+
+# Archivos temporales
+*.log
+*.pot
+*.pyc
+*.pyo
+*.swp
+*.swo
+
+# Static y media generados
+/staticfiles/
+/media/
+
+# Archivos de migraciones innecesarios
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Archivos de debug y pruebas
+debug.log
+coverage/
+htmlcov/
+
+# Django secret key si la manejás aparte
+secret.json
+
+# Archivos compilados en el sistema
+*.DS_Store
+Thumbs.db
