@@ -1,32 +1,40 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Metadatos -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Links CDN -->
-    
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <title>{% block title %}  {% endblock %}</title>
+    <title>{% block title %}Blog{% endblock %}</title>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
     <!-- Encabezado principal -->
-    <header>
-        {% if user.is_authenticated %}
-            <span>Hola, {{ user.username }}👋</span>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Cerrar sesión</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}">Iniciar sesión</a>
-            <a href="{% url 'signup' %}">Registrarse</a>
-        {% endif %}
+    <header class="bg-white shadow px-4 py-3 flex items-center justify-between">
+        <div class="text-lg font-semibold">Mi Blog</div>
+
+        <div class="flex items-center gap-4">
+            {% if user.is_authenticated %}
+                <span class="text-sm">Hola, {{ user.username }} 👋</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                        Cerrar sesión
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-blue-600 hover:underline text-sm">Iniciar sesión</a>
+                <a href="{% url 'signup' %}" class="text-blue-600 hover:underline text-sm">Registrarse</a>
+            {% endif %}
+        </div>
     </header>
 
     <!-- Cuerpo -->
-    <main>
+    <main class="max-w-3xl mx-auto mt-8 px-4">
         {% block content %}
         <!-- AGUANTE LA COCA COLA -->
         {% endblock %}

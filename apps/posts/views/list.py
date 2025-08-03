@@ -9,3 +9,6 @@ class PostListView(ListView):
 
     def get_queryset(self):
         return Post.objects.all().order_by('-creation_date')
+    
+
+    

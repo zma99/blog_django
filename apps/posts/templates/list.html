@@ -1,39 +1,41 @@
 {% extends 'base.html' %}
 
-{% block content %} 
+{% block content %}
 
 {% if request.user.is_authenticated and request.user.profile.is_editor %}
-  <a href="{% url 'posts:post_create' %}">Crear nuevo post</a>
+  <a href="{% url 'posts:post_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-6">
+    Crear nuevo post
+  </a>
 {% endif %}
 
-<section>
-    {% for post in posts %}
-
-        <article>
-            <h2>{{ post.title }}</h2>
-            <br>
-            <p>Autor: {{ post.author.username }}</p>
-            <p>Publicado: {{ post.creation_date|date:"d M Y" }}</p>
-            <br>
-            <p>{{ post.abstract }}</p>
-            <a href="#">Leer más</a>
-        </article>
-        <hr>
-    {% empty %}
-        <p>No se encontraron publicaciones.</p>    
-    {% endfor %}
+<section class="grid gap-6">
+  {% for post in posts %}
+    <article class="bg-white rounded-lg shadow p-6">
+      {% if post.cover %}
+        <img src="{{ post.cover.url }}" alt="Imagen de {{ post.title }}" class="w-full h-48 object-cover rounded-md mb-4">
+      {% endif %}
+      
+      <h2 class="text-xl font-bold text-gray-800 mb-2">{{ post.title }}</h2>
+      <p class="text-sm text-gray-500">Autor: <span class="font-medium">{{ post.author.username }}</span></p>
+      <p class="text-sm text-gray-500 mb-4">Publicado: {{ post.creation_date|date:"d M Y" }}</p>
+      <p class="text-gray-700 mb-4">{{ post.abstract }}</p>
+      <a href="#" class="text-blue-600 hover:underline font-medium text-sm">Leer más →</a>
+    </article>
+  {% empty %}
+    <p class="text-center text-gray-500">No se encontraron publicaciones.</p>
+  {% endfor %}
 </section>
 
 {% if is_paginated %}
-<nav class="pagination">
+  <nav class="flex items-center justify-center gap-4 mt-8 text-sm">
     {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+      <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Anterior</a>
     {% endif %}
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    <span class="text-gray-700">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+      <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Siguiente</a>
     {% endif %}
-</nav>
+  </nav>
 {% endif %}
 
 {% endblock %}
