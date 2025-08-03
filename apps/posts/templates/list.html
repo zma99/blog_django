@@ -19,7 +19,7 @@
       <p class="text-sm text-gray-500">Autor: <span class="font-medium">{{ post.author.username }}</span></p>
       <p class="text-sm text-gray-500 mb-4">Publicado: {{ post.creation_date|date:"d M Y" }}</p>
       <p class="text-gray-700 mb-4">{{ post.abstract }}</p>
-      <a href="#" class="text-blue-600 hover:underline font-medium text-sm">Leer más →</a>
+      <a href="{% url 'posts:detail' post.pk %}" class="text-blue-600 hover:underline font-medium text-sm">Leer más →</a>
     </article>
   {% empty %}
     <p class="text-center text-gray-500">No se encontraron publicaciones.</p>
