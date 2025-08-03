@@ -19,7 +19,12 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Autor')
     likes = models.ManyToManyField(User, related_name="likes", blank=True, verbose_name='Me gusta')
 
-  
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = Post.objects.get(pk=self.pk)
+            if old.cover and old.cover != self.cover:
+                old.cover.delete(save=False)
+        super().save(*args, **kwargs)    
 
     def __str__(self):
         return self.title
