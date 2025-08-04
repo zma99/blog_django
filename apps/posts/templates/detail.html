@@ -5,7 +5,7 @@
 {% block content %}
 
 <!-- Botones de acción -->
-<div class="mt-10 text-left">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-10 gap-4">
   <div class="flex flex-wrap gap-3">
     <a href="{% url 'index' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
       ← Volver al inicio
@@ -20,11 +20,52 @@
       </a>
     {% endif %}
   </div>
+
 </div>
+
+
 
 <div class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
 
   <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post.title }}</h1>
+
+  
+  <div class="flex items-center gap-6 text-sm text-gray-700 font-medium my-6">
+    <!-- Visualizaciones -->
+    <div class="flex items-center">
+      👁️ <span class="ml-1">{{ post.views }} vista{{ post.views|pluralize }}</span>
+    </div>
+
+    <!-- Likes -->
+    <div class="flex items-center space-x-2">
+      {% if request.user.is_authenticated and request.user != post.author %}
+        {% if request.user in post.likes.all %}
+          <button id="like-button"
+                  data-post-id="{{ post.id }}"
+                  class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+            👎 Quitar Me gusta ({{ post.likes.count }})
+          </button>
+        {% else %}
+          <button id="like-button"
+                  data-post-id="{{ post.id }}"
+                  class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+            👍 Me gusta ({{ post.likes.count }})
+          </button>
+        {% endif %}
+      {% else %}
+        <span class="text-sm text-gray-700">
+          💚 {{ post.likes.count }} Me gusta
+        </span>
+      {% endif %}
+    </div>
+
+
+
+    <!-- Comentarios -->
+    <div class="flex items-center">
+      💬 <span class="ml-1">{{ post.comments.count }} comentario{{ post.comments.count|pluralize }}</span>
+    </div>
+  </div>
 
   {% if post.cover %}
     <div class="mb-6">
@@ -49,4 +90,49 @@
     {% endif %}
   </div>
 </div>
+
+
+<div class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
+    <!-- Botón Comentar -->
+  {% if request.user.is_authenticated %}
+    <a href="#comentarios" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded">
+      💬 Comentar
+    </a>
+  {% else %}
+    <span class="text-gray-500 italic">Inicia sesión para comentar</span>
+  {% endif %}
+</div>
+
+
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const likeBtn = document.getElementById("like-button");
+    const postId = likeBtn.dataset.postId;
+
+    likeBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      fetch(`/posts/${postId}/like/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.liked) {
+          likeBtn.classList.replace("bg-green-500", "bg-red-500");
+          likeBtn.textContent = `👎 Quitar Me gusta (${data.likes_count})`;
+        } else {
+          likeBtn.classList.replace("bg-red-500", "bg-green-500");
+          likeBtn.textContent = `👍 Me gusta (${data.likes_count})`;
+        }
+      });
+    });
+  });
+  </script>
+
 {% endblock %}

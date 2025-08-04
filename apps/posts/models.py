@@ -18,6 +18,7 @@ class Post(models.Model):
     body = models.TextField(verbose_name='Cuerpo')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Autor')
     likes = models.ManyToManyField(User, related_name="likes", blank=True, verbose_name='Me gusta')
+    views = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -28,3 +29,13 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+
+class PostView(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'post')  # Evita duplicados
