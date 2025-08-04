@@ -1,7 +1,7 @@
 from .base import *
 
 ALLOWED_HOSTS = [
-    '192.168.1.20',
+    # '192.168.1.20',
 ]
 
 DEBUG = True

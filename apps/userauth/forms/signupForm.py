@@ -21,7 +21,19 @@ class SignupForm(forms.ModelForm):
         }
 
     def clean(self):
+        '''
+        Compara y valida que la contraseña en ambos campos coincidan         
+        '''
+
         cleaned_data = super().clean()
         if cleaned_data.get('password1') != cleaned_data.get('password2'):
             raise ValidationError("Las contraseñas no coinciden.")
         return cleaned_data
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)   # Crea la instancia pero no la guarda aún
+        user.set_password(self.cleaned_data["password1"])   # hashea la contraseña
+        if commit:
+            user.save() # Guarda en BD
+        return user
+    
