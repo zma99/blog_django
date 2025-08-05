@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block title %}{{ post.title }}{% endblock %}
 
@@ -92,6 +94,7 @@
 </div>
 
 
+<!-- COMENTARIOS -->
 <div id="comentarios" class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
   {% if request.user.is_authenticated %}
     <h2 class="text-xl font-semibold mb-4">💬 Comentarios</h2>
@@ -104,14 +107,20 @@
       </button>
     </form>
 
-    <ul id="comment-list" class="space-y-2 mt-6">
+  {% else %}
+    <span class="text-gray-500 italic">🔒 
+      <a href="{% url 'login' %}" class="text-blue-500 underline">Inicia sesión</a> para dejar un comentario
+    </span>
+  {% endif %}
+
+  <ul id="comment-list" class="space-y-2 mt-6">
       {% for comment in comments %}
         <li class="border-b pb-2">
-          <div class="flex justify-between items-center text-sm text-gray-700">
+          <div class="flex justify-between items-center text-sm text-gray-700 pb-3">
             <p><strong>{{ comment.user }}</strong> dijo:</p>
-            <p class="text-gray-500">{{ comment.created_at|date:"d/m/Y - H:i" }}</p>
+            <p class="text-xs text-gray-500">{{ comment.created_at|date:"d/m/Y - H:i" }}</p>
           </div>
-          <p class="text-gray-900">{{ comment.content }}</p>
+          <p class="text-sm text-gray-900">{{ comment.content }}</p>
         </li>
       {% endfor %}
     </ul>
@@ -121,14 +130,7 @@
         Ver más comentarios
       </button>
     {% endif %}
-
-  {% else %}
-    <span class="text-gray-500 italic">🔒 Inicia sesión para dejar un comentario</span>
-  {% endif %}
 </div>
-
-
-  {% load static %}
 
   <script src="{% static 'js/like_button.js' %}"></script>
   <script src="{% static 'js/see_more_comments.js' %}"></script>
