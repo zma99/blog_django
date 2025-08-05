@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView
 from apps.posts.models import Post, PostView
 from apps.posts.forms.comment_form import CommentForm
+from django.core.paginator import Paginator
 
 class PostDetailView(DetailView):
     model = Post
@@ -24,8 +25,17 @@ class PostDetailView(DetailView):
                 post.save(update_fields=["views"])
                 request.session[session_key] = True
 
+        all_comments = post.comments.select_related("user").order_by("-created_at")
+        paginator = Paginator(all_comments, 5)
+
+        page_number = request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
+
         context = self.get_context_data(object=post)
-        context["comments"] = post.comments.select_related("user").order_by("-created_at")
+        context["comments"] = page_obj.object_list
+        # context["comments"] = post.comments.select_related("user").order_by("-created_at")
+        context["has_next"] = page_obj.has_next()
+        context["next_page"] = page_obj.next_page_number() if page_obj.has_next() else None
         context["comment_form"] = CommentForm()
         return self.render_to_response(context)
 

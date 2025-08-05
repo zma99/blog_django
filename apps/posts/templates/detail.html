@@ -104,19 +104,23 @@
       </button>
     </form>
 
-    <ul class="space-y-2 mt-6">
+    <ul id="comment-list" class="space-y-2 mt-6">
       {% for comment in comments %}
         <li class="border-b pb-2">
           <div class="flex justify-between items-center text-sm text-gray-700">
             <p><strong>{{ comment.user }}</strong> dijo:</p>
-            <p class="text-xs text-gray-500">{{ comment.created_at|date:"d/m/Y - H:i" }}</p>
+            <p class="text-gray-500">{{ comment.created_at|date:"d/m/Y - H:i" }}</p>
           </div>
           <p class="text-gray-900">{{ comment.content }}</p>
         </li>
-      {% empty %}
-        <li class="text-gray-500 italic">Todavía no hay comentarios</li>
       {% endfor %}
     </ul>
+
+    {% if has_next %}
+      <button id="load-more" data-next="{{ next_page }}" class="mt-2 text-blue-500 hover:underline">
+        Ver más comentarios
+      </button>
+    {% endif %}
 
   {% else %}
     <span class="text-gray-500 italic">🔒 Inicia sesión para dejar un comentario</span>
@@ -127,5 +131,6 @@
   {% load static %}
 
   <script src="{% static 'js/like_button.js' %}"></script>
+  <script src="{% static 'js/see_more_comments.js' %}"></script>
 
 {% endblock %}
