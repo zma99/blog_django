@@ -14,6 +14,11 @@ class PostDetailView(DetailView):
 
         if request.user.is_authenticated:
             # Usuarios registrados: PostView individual
+            '''
+            # Trackeo de vistas: solo incremento si el registro es nuevo
+            # Ignoramo el objeto devuelto de get_or_create con "_" (devulve una tupla)
+            _, created = PostView.objects.get_or_create(user=request.user, post=post)
+            '''
             _, created = PostView.objects.get_or_create(user=request.user, post=post)
             if created:
                 post.views += 1

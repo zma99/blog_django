@@ -104,35 +104,8 @@
 </div>
 
 
+  {% load static %}
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const likeBtn = document.getElementById("like-button");
-    const postId = likeBtn.dataset.postId;
-
-    likeBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-
-      fetch(`/posts/${postId}/like/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({})
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.liked) {
-          likeBtn.classList.replace("bg-green-500", "bg-red-500");
-          likeBtn.textContent = `👎 Quitar Me gusta (${data.likes_count})`;
-        } else {
-          likeBtn.classList.replace("bg-red-500", "bg-green-500");
-          likeBtn.textContent = `👍 Me gusta (${data.likes_count})`;
-        }
-      });
-    });
-  });
-  </script>
+  <script src="{% static 'js/like_button.js' %}"></script>
 
 {% endblock %}
