@@ -21,6 +21,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Autor')
     likes = models.ManyToManyField(User, related_name="likes", blank=True, verbose_name='Me gusta')
     views = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         if self.pk:

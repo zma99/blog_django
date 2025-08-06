@@ -33,12 +33,12 @@
 
   
   <div class="flex items-center gap-6 text-sm text-gray-700 font-medium my-6">
-    <!-- Visualizaciones -->
+    <!-- CANTIDAD DE VIEWS -->
     <div class="flex items-center">
       👁️ <span class="ml-1">{{ post.views }} vista{{ post.views|pluralize }}</span>
     </div>
 
-    <!-- Likes -->
+    <!-- CANTIDAD DE LIKES -->
     <div class="flex items-center space-x-2">
       {% if request.user.is_authenticated and request.user != post.author %}
         {% if request.user in post.likes.all %}
@@ -63,12 +63,20 @@
 
 
 
-    <!-- Comentarios -->
+    <!-- CANTIDAD DE COMENTARIOS -->
     <div class="flex items-center">
       💬 <span class="ml-1">{{ post.comments.count }} comentario{{ post.comments.count|pluralize }}</span>
     </div>
+
+    <div>
+      {% if post.updated_at.date > post.creation_date.date %}
+        <span class="text-xs text-gray-500 italic">Post editado: {{ post.updated_at|date:"d M Y" }}</span>
+      {% endif %}
+    </div>
   </div>
 
+
+  <!-- POST -->
   {% if post.cover %}
     <div class="mb-6">
       <img src="{{ post.cover.url }}" alt="Imagen de portada" class="w-full h-auto rounded-lg shadow-sm">
