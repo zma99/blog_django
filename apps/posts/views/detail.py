@@ -57,5 +57,6 @@ class PostDetailView(DetailView):
         context["comment_form"] = form
         return self.render_to_response(context)
 
+    
     def get_queryset(self):
         return super().get_queryset().prefetch_related('likes')

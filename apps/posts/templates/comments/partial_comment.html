@@ -1,0 +1,48 @@
+<li class="border-b pb-2" id="comment-{{ comment.id }}">
+  <div class="flex justify-between items-center text-sm text-gray-700 pb-3">
+    <p><strong>{{ comment.user }}</strong> dijo:</p>
+    <div class="flex flex-col text-right">
+      <span class="text-xs text-gray-500 italic">
+        Publicado: {{ comment.created_at|date:"d/m/Y - H:i" }}
+      </span>
+
+      {% if comment.updated_at|date:"U" > comment.created_at|date:"U" %}
+        <span class="text-xs text-gray-500 italic" id="edited-{{ comment.id }}">
+          Editado: {{ comment.updated_at|date:"d/m/Y - H:i" }}
+        </span>
+      {% else %}
+        <span class="text-xs text-gray-500 italic hidden" id="edited-{{ comment.id }}"></span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Contenido del comentario -->
+  <p class="text-sm text-gray-900 max-h-20 break-words" id="content-{{ comment.id }}">
+    {{ comment.content }}
+  </p>
+
+  <!-- Textarea oculta para edición -->
+  <textarea
+    id="edit-{{ comment.id }}"
+    class="w-full text-sm text-gray-900 border border-gray-300 rounded p-2 mt-2"
+    style="display:none;"
+  >{{ comment.content }}</textarea>
+
+  {% if comment.user == request.user %}
+    <div class="flex gap-2 mt-2">
+      <!-- Botón para activar edición -->
+      <button
+        data-id="{{ comment.id }}"
+        class="edit-btn text-sm text-blue-500 hover:underline"
+      >Editar</button>
+
+      <!-- Botón para guardar edición -->
+      <button
+        id="save-{{ comment.id }}"
+        data-id="{{ comment.id }}"
+        class="save-btn text-sm text-green-500 hover:underline"
+        style="display:none;"
+      >Guardar</button>
+    </div>
+  {% endif %}
+</li>
