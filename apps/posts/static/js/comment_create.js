@@ -1,25 +1,12 @@
-// 🔐 Obtener el token CSRF desde la cookie
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+import { getCSRFToken, showAlert } from './utils.js';
 
+const csrfToken = getCSRFToken();
 
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('comment-form');
   const commentList = document.getElementById('comment-list');
 
-  if (!form || !commentList) return; // Evita errores si no existen
+  if (!form || !commentList) return;
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -28,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const content = contentInput.value;
 
     if (!content.trim()) {
-      alert("El comentario no puede estar vacío.");
+      showAlert("El comentario no puede estar vacío.");
       return;
     }
 
@@ -43,9 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
       body: `content=${encodeURIComponent(content)}`
     })
     .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
       return response.json();
     })
     .then(data => {
@@ -57,12 +42,12 @@ document.addEventListener('DOMContentLoaded', function () {
           newComment.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       } else {
-        alert(data.error);
+        showAlert(data.error);
       }
     })
     .catch(error => {
       console.error("Error al enviar el comentario:", error);
-      alert("Hubo un problema al enviar el comentario.");
+      showAlert("Hubo un problema al enviar el comentario.");
     });
   });
 });

@@ -19,13 +19,19 @@ class Profile(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     avatar = models.ImageField(
         upload_to="users/profile/avatars/",
-        default="users/profile/uknown-avatar.png",
+        default="users/profile/avatars/uknown-avatar.png",
         null=True,
         blank=True,
     )
 
     def is_editor(self):
         return self.rol == "editor"
+    
+    def is_auditor(self):
+        return self.rol == "auditor"
+    
+    def is_not_auditor(self):
+        return self.rol != "auditor"
 
     def __str__(self):
         return f"{self.user.username} - {self.rol}"

@@ -1,5 +1,6 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseForbidden
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.utils.timezone import localtime
 from apps.posts.models import Comment
@@ -38,3 +39,22 @@ class CommentUpdateAjaxView(View):
                 'edited_at': localtime(comment.updated_at).strftime('%d/%m/%Y - %H:%M')  # 👈 esta línea
             })
         return JsonResponse({'success': False, 'error': 'Contenido vacío'})
+    
+
+
+class CommentDeleteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        comment_id = request.POST.get('id')
+
+        try:
+            comment = Comment.objects.get(id=comment_id)
+
+            # if request.user.profile.is_auditor or request.user == comment.user:
+            if request.user.profile.is_auditor:
+                comment.delete()
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': 'No tenés permiso para eliminar este comentario.'}, status=403)
+
+        except Comment.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Comentario no encontrado.'}, status=404)

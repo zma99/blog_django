@@ -1,33 +1,43 @@
-// comment_edit.js
+import { getCSRFToken, showAlert } from './utils.js';
 
-// 🔐 Obtener el token CSRF desde la cookie
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
+const csrfToken = getCSRFToken();
+
+// 🔍 Obtener y validar los elementos del comentario
+function getCommentElements(id) {
+  const contentEl = document.getElementById(`content-${id}`);
+  const editEl = document.getElementById(`edit-${id}`);
+  const saveEl = document.getElementById(`save-${id}`);
+  const editedSpan = document.getElementById(`edited-${id}`);
+
+  if (!contentEl || !editEl || !saveEl || !editedSpan) {
+    console.warn(`Elementos del comentario ${id} no encontrados. Puede que haya sido eliminado.`);
+    return null;
   }
-  return cookieValue;
-}
 
-const csrfToken = getCookie('csrftoken');
+  return { contentEl, editEl, saveEl, editedSpan };
+}
 
 // ✏️ Mostrar el textarea de edición
 function toggleEdit(id) {
-  document.getElementById(`content-${id}`).style.display = 'none';
-  document.getElementById(`edit-${id}`).style.display = 'block';
-  document.getElementById(`save-${id}`).style.display = 'inline';
+  const elements = getCommentElements(id);
+  if (!elements) return;
+
+  const { contentEl, editEl, saveEl } = elements;
+
+  contentEl.style.display = 'none';
+  editEl.style.display = 'block';
+  saveEl.style.display = 'inline';
 }
 
 // 💾 Guardar el comentario editado
 function saveEdit(id) {
-  const content = document.getElementById(`edit-${id}`).value;
+  const editInput = document.getElementById(`edit-${id}`);
+  if (!editInput) {
+    console.warn(`Textarea de edición para ${id} no encontrado.`);
+    return;
+  }
+
+  const content = editInput.value;
 
   fetch(`/posts/comment/${id}/edit/`, {
     method: 'POST',
@@ -38,39 +48,39 @@ function saveEdit(id) {
     body: `content=${encodeURIComponent(content)}`
   })
   .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return response.json();
   })
   .then(data => {
     if (data.success) {
-      // Actualizar contenido
-      document.getElementById(`content-${id}`).innerText = data.content;
-      document.getElementById(`content-${id}`).style.display = 'block';
-      document.getElementById(`edit-${id}`).style.display = 'none';
-      document.getElementById(`save-${id}`).style.display = 'none';
+      const elements = getCommentElements(id);
+      if (!elements) return;
 
-      // Mostrar y actualizar el mensaje de "Editado"
-      const editedSpan = document.getElementById(`edited-${id}`);
-      editedSpan.textContent = `Editado: ${data.edited_at}`;  // 👈 actualiza la fecha
-      editedSpan.classList.remove('hidden');                  // 👈 lo muestra
+      const { contentEl, editEl, saveEl, editedSpan } = elements;
+
+      contentEl.innerText = data.content;
+      contentEl.style.display = 'block';
+      editEl.style.display = 'none';
+      saveEl.style.display = 'none';
+
+      editedSpan.textContent = `Editado: ${data.edited_at}`;
+      editedSpan.classList.remove('hidden');
     } else {
-      alert(data.error);
+      showAlert(data.error);
     }
   })
   .catch(error => {
     console.error("Error al editar el comentario:", error);
-    alert("Hubo un problema al guardar el comentario.");
+    showAlert("Hubo un problema al guardar el comentario.");
   });
 }
 
+// 🧠 Delegación de eventos
 document.addEventListener('DOMContentLoaded', () => {
-    const commentList = document.getElementById('comment-list');
+  const commentList = document.getElementById('comment-list');
+  if (!commentList) return;
 
-    if (!commentList) return; 
-
-    commentList.addEventListener('click', (e) => {
+  commentList.addEventListener('click', (e) => {
     const editBtn = e.target.closest('.edit-btn');
     const saveBtn = e.target.closest('.save-btn');
 

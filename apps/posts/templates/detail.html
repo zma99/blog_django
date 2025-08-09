@@ -14,7 +14,8 @@
       ← Volver al inicio
     </a>
 
-    {% if request.user.is_authenticated and request.user == post.author and request.user.profile.is_editor %}
+    {% if request.user.is_authenticated %}
+    {% if request.user.profile.is_auditor or request.user == post.author %}
     <a href="{% url 'posts:edit' post.pk %}"
       class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium px-3 py-2 rounded text-sm">
       ✏️ Editar
@@ -23,6 +24,7 @@
       class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
       🗑️ Eliminar
     </a>
+    {% endif %}
     {% endif %}
   </div>
 
@@ -47,7 +49,7 @@
 
     <!-- CANTIDAD DE LIKES -->
     <div class="flex items-center space-x-2">
-      {% if request.user.is_authenticated and request.user != post.author %}
+      {% if request.user.is_authenticated and request.user != post.author and request.user.is_not_auditor%}
       {% if request.user in post.likes.all %}
       <button id="like-button" data-post-id="{{ post.id }}"
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
@@ -156,18 +158,30 @@
         <!-- Textarea oculta para edición -->
         <textarea id="edit-{{ comment.id }}"
           class="w-full text-sm text-gray-900 border border-gray-300 rounded p-2 mt-2"
-          style="display:none;">{{ comment.content }}</textarea>
+          style="display:none;">{{ comment.content }}
+        </textarea>
 
-        {% if comment.user == request.user %}
+
+        <!-- BOTONES -->
         <div class="flex gap-2 mt-2">
-          <!-- Botón para activar edición -->
-          <button data-id="{{ comment.id }}" class="edit-btn text-sm text-blue-500 hover:underline">Editar</button>
+          {% if request.user.profile.is_auditor %}
+            <!-- Botón para eliminar -->
+            <button id="delete-{{ comment.id }}" data-id="{{ comment.id }}"
+              class="delete-btn text-sm text-red-500 hover:underline">
+              Eliminar
+            </button>
 
-          <!-- Botón para guardar edición -->
-          <button id="save-{{ comment.id }}" data-id="{{ comment.id }}"
-            class="save-btn text-sm text-green-500 hover:underline" style="display:none;">Guardar</button>
+
+          {% elif comment.user == request.user %}
+            <!-- Botón para activar edición -->
+            <button data-id="{{ comment.id }}" class="edit-btn text-sm text-blue-500 hover:underline">Editar</button>
+
+            <!-- Botón para guardar edición -->
+            <button id="save-{{ comment.id }}" data-id="{{ comment.id }}"
+              class="save-btn text-sm text-green-500 hover:underline" style="display:none;">Guardar</button>
+          {% endif %}
         </div>
-        {% endif %}
+
       </li>
       {% endfor %}
     </ul>
@@ -181,9 +195,6 @@
   {% endif %}
 </div>
 
-<script src="{% static 'js/like_button.js' %}"></script>
-<script src="{% static 'js/see_more_comments.js' %}"></script>
-<script src="{% static 'js/comment_edit.js' %}"></script>
-<script src="{% static 'js/comment_create.js' %}"></script>
+<script type="module" src="{% static 'js/main.js' %}"></script>
 
 {% endblock %}
