@@ -18,7 +18,8 @@ class Category(models.Model):
 
 class Post(models.Model):
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, verbose_name="Categoría"
+        Category, on_delete=models.SET_NULL, null=True, verbose_name="Categoría",
+        default=1
     )
     creation_date = models.DateTimeField(
         auto_now_add=True, verbose_name="Fecha de creación"
