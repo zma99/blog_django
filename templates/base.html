@@ -19,7 +19,7 @@
 
         <div class="flex items-center gap-4">
             {% if user.is_authenticated %}
-                <span class="text-sm">Hola, {{ user.username }} 👋</span>
+                <span class="text-sm">Hola, <a href="{% url 'profile_view' %}" class="hover:underline">{{ user.username }}</a> 👋</span>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
