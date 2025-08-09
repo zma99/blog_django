@@ -12,6 +12,7 @@ class Profile(models.Model):
     requested_editor = models.BooleanField(default=False)
     requested_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     approved_at = models.DateTimeField(null=True, blank=True)
+    avatar = models.ImageField(upload_to='users/profile/avatars/', null=True, blank=True)
 
     def is_editor(self):
         return self.rol == "editor"
