@@ -28,5 +28,6 @@ urlpatterns = [
     path('', PostListView.as_view(), name='index'),
     path('auth/', include('apps.userauth.urls')),
     path('posts/', include('apps.posts.urls')),
+    path('user/', include('apps.users.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
