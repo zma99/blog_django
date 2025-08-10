@@ -15,14 +15,23 @@
 
 <body class="bg-gray-100 text-gray-800 font-sans">
     <!-- Encabezado principal -->
-    <header class="bg-white shadow px-6 py-4 flex items-center justify-between">
-        <!-- Logo / Título -->
-        <div class="text-xl font-bold text-gray-800">
-            <a href="{% url 'index' %}" class="hover:text-blue-600 transition">Mi Blog</a>
-        </div>
+    <header class="relative bg-white shadow px-6 py-4 flex items-center justify-between">
+        <!-- Botón hamburguesa (izquierda) -->
+        <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
         <!-- Navegación principal -->
-        <nav class="hidden md:flex gap-6 text-sm text-gray-700">
+        <nav id="mobile-menu"
+            class="hidden md:flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-gray-700 absolute top-full left-0 w-full bg-white px-6 py-4 md:static md:bg-transparent md:px-0 md:py-0 z-40 shadow-md md:shadow-none transition-all duration-300 ease-in-out">
+
+            <!-- Título dentro del menú en móviles -->
+            <div class="md:hidden text-lg font-bold text-gray-800">
+                <a href="{% url 'index' %}" class="hover:text-blue-600 transition">Mi Blog</a>
+            </div>
+
             <a href="{% url 'index' %}" class="hover:text-blue-600">Inicio</a>
             <a href="{% url 'posts:list' %}" class="hover:text-blue-600">Posts</a>
 
@@ -36,7 +45,6 @@
                     </svg>
                 </button>
 
-                <!-- Menú de categorías -->
                 <div id="category-menu" class="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg hidden z-50">
                     {% for category in categories %}
                     <a href="{% url 'posts:posts_by_category' category.slug %}"
@@ -88,11 +96,9 @@
                     Registrarse
                 </a>
             </div>
-
             {% endif %}
         </div>
     </header>
-
     <!-- Cuerpo -->
     <main class="max-w-3xl mx-auto mt-8 px-4 pb-12">
         {% block content %} {% endblock %}
