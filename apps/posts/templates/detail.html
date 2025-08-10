@@ -164,14 +164,12 @@
 
         <!-- BOTONES -->
         <div class="flex gap-2 mt-2">
-          {% if request.user.profile.is_auditor %}
+          {% if request.user.profile.is_auditor or request.user.profile.is_admin%}
             <!-- Botón para eliminar -->
             <button id="delete-{{ comment.id }}" data-id="{{ comment.id }}"
               class="delete-btn text-sm text-red-500 hover:underline">
               Eliminar
             </button>
-
-
           {% elif comment.user == request.user %}
             <!-- Botón para activar edición -->
             <button data-id="{{ comment.id }}" class="edit-btn text-sm text-blue-500 hover:underline">Editar</button>

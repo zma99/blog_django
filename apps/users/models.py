@@ -32,6 +32,9 @@ class Profile(models.Model):
     
     def is_not_auditor(self):
         return self.rol != "auditor"
+    
+    def is_admin(self):
+        return self.rol == "admin"
 
     def __str__(self):
         return f"{self.user.username} - {self.rol}"
