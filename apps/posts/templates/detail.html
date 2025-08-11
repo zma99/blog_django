@@ -49,22 +49,22 @@
 
     <!-- CANTIDAD DE LIKES -->
     <div class="flex items-center space-x-2">
-      {% if request.user.is_authenticated and request.user != post.author and request.user.is_not_auditor%}
-      {% if request.user in post.likes.all %}
-      <button id="like-button" data-post-id="{{ post.id }}"
-        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
-        👎 Quitar Me gusta ({{ post.likes.count }})
-      </button>
+      {% if request.user.is_authenticated and request.user != post.author and request.user.profile.is_not_auditor %}
+        {% if request.user in post.likes.all %}
+          <button id="like-button" data-post-id="{{ post.id }}"
+            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+            👎 Quitar Me gusta ({{ post.likes.count }})
+          </button>
+        {% else %}
+          <button id="like-button" data-post-id="{{ post.id }}"
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+            👍 Me gusta ({{ post.likes.count }})
+          </button>
+        {% endif %}
       {% else %}
-      <button id="like-button" data-post-id="{{ post.id }}"
-        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
-        👍 Me gusta ({{ post.likes.count }})
-      </button>
-      {% endif %}
-      {% else %}
-      <span class="text-sm text-gray-700">
-        💚 {{ post.likes.count }} Me gusta
-      </span>
+        <span class="text-sm text-gray-700">
+          💚 {{ post.likes.count }} Me gusta
+        </span>
       {% endif %}
     </div>
 
