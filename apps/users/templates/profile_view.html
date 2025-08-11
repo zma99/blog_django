@@ -50,7 +50,7 @@
       <span class="inline-block px-2 py-1 rounded 
         {% if profile.rol == 'admin' %}bg-red-200 text-red-800
         {% elif profile.rol == 'editor' %}bg-green-200 text-green-800
-        {% elif profile.rol == 'auditor' %}bg-yellow-200 text-yellow-800
+        {% elif profile.rol == 'moderador' %}bg-yellow-200 text-yellow-800
         {% else %}bg-gray-200 text-gray-800{% endif %}">
         {{ profile.rol|title }}
       </span>

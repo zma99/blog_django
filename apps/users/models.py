@@ -8,7 +8,7 @@ class Profile(models.Model):
         max_length=20,
         choices=[
             ("admin", "Admin"),
-            ("auditor", "Auditor"),
+            ("moderador", "Moderador"),
             ("editor", "Editor"),
             ("reader", "Reader"),
         ],
@@ -28,10 +28,10 @@ class Profile(models.Model):
         return self.rol == "editor"
     
     def is_auditor(self):
-        return self.rol == "auditor"
+        return self.rol == "moderador"
     
     def is_not_auditor(self):
-        return self.rol != "auditor"
+        return self.rol != "moderador"
     
     def is_admin(self):
         return self.rol == "admin"
