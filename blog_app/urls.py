@@ -21,7 +21,9 @@ from django.conf.urls.static import static
 
 from django.urls import path, include
 from .views import IndexView
-from apps.posts.views.list import PostListView
+from django.contrib.auth.decorators import login_required
+from django_ckeditor_5 import views as ckeditor5_views
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,4 +31,8 @@ urlpatterns = [
     path("auth/", include("apps.userauth.urls")),
     path("posts/", include("apps.posts.urls")),
     path("user/", include("apps.users.urls")),
+
+    #CKEditor 5
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
+    path('ckeditor5/upload_file/', login_required(ckeditor5_views.upload_file), name='ckeditor5_upload_file'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,6 +2,7 @@
 {% load static %}
 
 
+
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
@@ -66,7 +67,7 @@
 
 <div class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
 
-  <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post.title }}</h1>
+  <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post.title|title }}</h1>
   <a href="{% url 'posts:posts_by_category' post.category.slug %}"
     class="text-sm text-black bg-green-300 rounded-lg py-1 px-3 hover:bg-green-500 hover:shadow">
     {{ post.category.name }}
@@ -108,8 +109,8 @@
     </div>
 
     <div>
-      {% if post.updated_at.date > post.creation_date.date %}
-      <span class="text-xs text-gray-500 italic">Post editado: {{ post.updated_at|date:"d M Y" }}</span>
+      {% if post.updated_at > post.creation_date %}
+      <span class="text-xs text-gray-500 italic">Ultima actualización: {{ post.updated_at|date:"d M Y - H:i" }}</span>
       {% endif %}
     </div>
   </div>
@@ -128,9 +129,10 @@
 
   <hr class="border-gray-200 my-6">
 
-  <article>
-    <p class="text-lg text-gray-700 leading-relaxed whitespace-pre-line">{{ post.body }}</p>
+  <article class="prose prose-lg prose-gray max-w-none">
+    {{ post.body|safe }}
   </article>
+
 
   <div class="flex justify-between items-center text-sm text-gray-400 mt-8">
     <span>Publicado el {{ post.creation_date|date:"d M Y" }}</span>

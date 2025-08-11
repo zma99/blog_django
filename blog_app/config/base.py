@@ -44,6 +44,7 @@ SECOND_APPS = [
 
 THIRD_APPS = [
     # Apps de terceros
+    'django_ckeditor_5',
 ]
 
 INSTALLED_APPS = FIRST_APPS + SECOND_APPS + THIRD_APPS
@@ -131,3 +132,20 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Tu App <noreply@tuapp.com>'
 
 
+# CKEditor 5
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'upload_url': 'ckeditor5_upload_file',  # esta es la vista que fallaba
+        'image': {
+            'toolbar': ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side'],
+        },
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+            '|', 'blockQuote', 'insertTable', 'uploadImage', 'undo', 'redo'
+        ],
+        'height': '400px',
+        'width': 'auto',
+        'language': 'es'
+    }
+}
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"

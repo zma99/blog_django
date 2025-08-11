@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django_ckeditor_5.fields import CKEditor5Field
 from django.contrib.auth.models import User
 
 
@@ -32,7 +33,8 @@ class Post(models.Model):
     )
     title = models.CharField(max_length=50, verbose_name="Título")
     abstract = models.TextField(max_length=300, verbose_name="Resumen")
-    body = models.TextField(verbose_name="Cuerpo")
+    # body = models.TextField(verbose_name="Cuerpo")
+    body = CKEditor5Field(config_name='default')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Autor")
     likes = models.ManyToManyField(
         User, related_name="likes", blank=True, verbose_name="Me gusta"
