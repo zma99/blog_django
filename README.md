@@ -5,25 +5,30 @@ blog_app es una aplicación web desarrollada con Django que permite gestionar pu
 Características principales
 - Autenticación de usuarios con roles diferenciados
 - CRUD completo para posts, categorías y usuarios
-- Roles: Admin (admin), Editor (editor), Lector (reader)
+- Post con texto enriquecido
+- Roles: Admin (admin), Moderador (moderator), Editor (editor), Lector (reader)
 - Estructura modular para escalar y adaptar fácilmente
 
 ⚙️ Tecnologías utilizadas
-- Django 4.x
+- Django 5.2.4
 - HTML / CSS / JS básico
 - Tailwind
 - MySQL
+- CKEditor-5
 
 
 🚀 Instalación rápida
-git clone https://github.com/tu_usuario/blog_app.git
-cd blog_app
-python -m venv venv
-source venv/bin/activate      # en Linux/macOS
-venv\Scripts\activate         # en Windows
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+1. git clone https://github.com/tu_usuario/blog_app.git
+2. cd blog_app
+3. python -m venv venv
+4. 
+    source venv/bin/activate      # en Linux/macOS
+    venv\Scripts\activate         # en Windows
+
+5. pip install -r requirements.txt
+6. python manage.py migrate
+7. python manage.py runserver
 
 
 
+⚠️ NOTA: Aplicación en fase de desarrollo.
