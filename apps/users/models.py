@@ -27,10 +27,10 @@ class Profile(models.Model):
     def is_editor(self):
         return self.rol == "editor"
     
-    def is_auditor(self):
+    def is_moderador(self):
         return self.rol == "moderador"
     
-    def is_not_auditor(self):
+    def is_not_moderador(self):
         return self.rol != "moderador"
     
     def is_admin(self):

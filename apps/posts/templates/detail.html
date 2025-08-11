@@ -6,6 +6,24 @@
 
 {% block content %}
 
+  {% if messages %}
+    <div class="w-full space-y-2">
+      {% for message in messages %}
+        <div class="px-4 py-2 rounded-md shadow-sm text-sm font-medium
+                    {% if message.tags == 'success' %}
+                      bg-green-100 border border-green-300 text-green-800
+                    {% elif message.tags == 'error' %}
+                      bg-red-100 border border-red-300 text-red-800
+                    {% elif message.tags == 'warning' %}
+                      bg-yellow-100 border border-yellow-300 text-yellow-800
+                    {% else %}
+                      bg-gray-100 border border-gray-300 text-gray-800
+                    {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 <!-- Botones de acción -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-10 gap-4">
   <div class="flex flex-wrap gap-3">
@@ -15,16 +33,30 @@
     </a>
 
     {% if request.user.is_authenticated %}
-    {% if request.user.profile.is_auditor or request.user == post.author %}
-    <a href="{% url 'posts:edit' post.pk %}"
-      class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium px-3 py-2 rounded text-sm">
-      ✏️ Editar
-    </a>
-    <a href="{% url 'posts:delete' post.pk %}"
-      class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
-      🗑️ Eliminar
-    </a>
+      {% if request.user == post.author %}
+        <a href="{% url 'posts:edit' post.pk %}"
+          class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium px-3 py-2 rounded text-sm">
+          ✏️ Editar
+        </a>
+        <a href="{% url 'posts:delete' post.pk %}"
+          class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
+          🗑️ Eliminar
+        </a>
+      {% endif %}
+      
     {% endif %}
+
+    {% if request.user.profile.is_moderador %}
+      {% if user_has_reported %}
+        <div class="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-md px-4 py-2 shadow-sm">
+          <span class="text-sm font-medium">Ya reportaste este post</span>
+        </div>
+      {% else %}
+        <a href="{% url 'posts:report' post.id %}"
+          class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
+          ⚠️ Reportar
+        </a>
+      {% endif %}
     {% endif %}
   </div>
 
@@ -49,7 +81,7 @@
 
     <!-- CANTIDAD DE LIKES -->
     <div class="flex items-center space-x-2">
-      {% if request.user.is_authenticated and request.user != post.author and request.user.profile.is_not_auditor %}
+      {% if request.user.is_authenticated and request.user != post.author and request.user.profile.is_not_moderador %}
         {% if request.user in post.likes.all %}
           <button id="like-button" data-post-id="{{ post.id }}"
             class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
@@ -164,7 +196,7 @@
 
         <!-- BOTONES -->
         <div class="flex gap-2 mt-2">
-          {% if request.user.profile.is_auditor or request.user.profile.is_admin%}
+          {% if request.user.profile.is_moderador or request.user.profile.is_admin%}
             <!-- Botón para eliminar -->
             <button id="delete-{{ comment.id }}" data-id="{{ comment.id }}"
               class="delete-btn text-sm text-red-500 hover:underline">

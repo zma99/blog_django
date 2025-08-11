@@ -1,8 +1,9 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 
 
+# CATEGORIA
 class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True, blank=True)
@@ -16,6 +17,8 @@ class Category(models.Model):
         return self.name
 
 
+
+# POST
 class Post(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, verbose_name="Categoría",
@@ -57,6 +60,32 @@ class PostView(models.Model):
         unique_together = ("user", "post")  # Evita duplicados
 
 
+
+class PostReport(models.Model):
+    REASON_CHOICES = [
+        ('inapropiado', 'Contenido inapropiado'),
+        ('ofensivo', 'Lenguaje ofensivo'),
+        ('spam', 'Spam o publicidad'),
+        ('otro', 'Otro'),
+    ]
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='reports')
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=20, choices=REASON_CHOICES)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if PostReport.objects.filter(post=self.post, reported_by=self.reported_by).exists():
+            raise ValidationError("Ya has reportado este post.")
+
+
+    def __str__(self):
+        return f"Reporte de {self.post.title} por {self.reported_by.username}"
+
+
+
+# COMENTARIO
 class Comment(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
