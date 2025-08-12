@@ -23,6 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-ez^tgwu4-ym74igbvfb5_%#th9kuk^ttd&bbd9rn59)%&sc3w^'
 
+# CONTROL DE SESIONES
+# Tiempo máximo de sesión en segundos (ej. 15 minutos)
+SESSION_COOKIE_AGE = 1 * 60
+
+# Cierra la sesión al cerrar el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 # Application definition
 

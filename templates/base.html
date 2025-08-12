@@ -16,7 +16,12 @@
     <title>{% block title %}Blog{% endblock %}</title>
 </head>
 
-<body class="bg-gray-100 text-gray-800 font-sans">
+<!-- Alerta por inactividad -->
+<div id="session-warning" class="hidden fixed bottom-4 right-4 bg-yellow-100 text-yellow-800 px-4 py-2 rounded shadow-lg text-sm z-50">
+  Tu sesión expirará pronto por inactividad.
+</div>
+
+<body class="bg-gray-100 text-gray-800 font-sans" data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
     <!-- Encabezado principal -->
     <header class="relative bg-white shadow px-6 py-4 flex items-center justify-between">
         <!-- Botón hamburguesa (izquierda) -->
@@ -108,6 +113,6 @@
     </main>
 </body>
 
-<script src="{% static 'js/menu-toggle.js' %}"></script>
+<script type="module" src="{% static 'js/main.js' %}"></script>
 
 </html>
