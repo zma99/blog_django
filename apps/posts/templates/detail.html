@@ -2,24 +2,62 @@
 {% load static %}
 
 
+
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
 
+  {% if messages %}
+    <div class="w-full space-y-2">
+      {% for message in messages %}
+        <div class="px-4 py-2 rounded-md shadow-sm text-sm font-medium
+                    {% if message.tags == 'success' %}
+                      bg-green-100 border border-green-300 text-green-800
+                    {% elif message.tags == 'error' %}
+                      bg-red-100 border border-red-300 text-red-800
+                    {% elif message.tags == 'warning' %}
+                      bg-yellow-100 border border-yellow-300 text-yellow-800
+                    {% else %}
+                      bg-gray-100 border border-gray-300 text-gray-800
+                    {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 <!-- Botones de acción -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-10 gap-4">
   <div class="flex flex-wrap gap-3">
-    <a href="{% url 'index' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
+    <a href="{% url 'index' %}"
+      class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
       ← Volver al inicio
     </a>
 
-    {% if request.user.is_authenticated and request.user == post.author and request.user.profile.is_editor %}
-      <a href="{% url 'posts:edit' post.pk %}" class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium px-3 py-2 rounded text-sm">
-        ✏️ Editar
-      </a>
-      <a href="{% url 'posts:delete' post.pk %}" class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
-        🗑️ Eliminar
-      </a>
+    {% if request.user.is_authenticated %}
+      {% if request.user == post.author %}
+        <a href="{% url 'posts:edit' post.pk %}"
+          class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium px-3 py-2 rounded text-sm">
+          ✏️ Editar
+        </a>
+        <a href="{% url 'posts:delete' post.pk %}"
+          class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
+          🗑️ Eliminar
+        </a>
+      {% endif %}
+      
+    {% endif %}
+
+    {% if request.user.profile.is_moderador %}
+      {% if user_has_reported %}
+        <div class="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-md px-4 py-2 shadow-sm">
+          <span class="text-sm font-medium">Ya reportaste este post</span>
+        </div>
+      {% else %}
+        <a href="{% url 'posts:report' post.id %}"
+          class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded text-sm">
+          ⚠️ Reportar
+        </a>
+      {% endif %}
     {% endif %}
   </div>
 
@@ -29,9 +67,13 @@
 
 <div class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
 
-  <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post.title }}</h1>
+  <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post.title|title }}</h1>
+  <a href="{% url 'posts:posts_by_category' post.category.slug %}"
+    class="text-sm text-black bg-green-300 rounded-lg py-1 px-3 hover:bg-green-500 hover:shadow">
+    {{ post.category.name }}
+  </a>
 
-  
+
   <div class="flex items-center gap-6 text-sm text-gray-700 font-medium my-6">
     <!-- CANTIDAD DE VIEWS -->
     <div class="flex items-center">
@@ -40,17 +82,15 @@
 
     <!-- CANTIDAD DE LIKES -->
     <div class="flex items-center space-x-2">
-      {% if request.user.is_authenticated and request.user != post.author %}
+      {% if request.user.is_authenticated and request.user != post.author and request.user.profile.is_not_moderador %}
         {% if request.user in post.likes.all %}
-          <button id="like-button"
-                  data-post-id="{{ post.id }}"
-                  class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+          <button id="like-button" data-post-id="{{ post.id }}"
+            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
             👎 Quitar Me gusta ({{ post.likes.count }})
           </button>
         {% else %}
-          <button id="like-button"
-                  data-post-id="{{ post.id }}"
-                  class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+          <button id="like-button" data-post-id="{{ post.id }}"
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
             👍 Me gusta ({{ post.likes.count }})
           </button>
         {% endif %}
@@ -69,8 +109,8 @@
     </div>
 
     <div>
-      {% if post.updated_at.date > post.creation_date.date %}
-        <span class="text-xs text-gray-500 italic">Post editado: {{ post.updated_at|date:"d M Y" }}</span>
+      {% if post.updated_at > post.creation_date %}
+      <span class="text-xs text-gray-500 italic">Ultima actualización: {{ post.updated_at|date:"d M Y - H:i" }}</span>
       {% endif %}
     </div>
   </div>
@@ -78,25 +118,26 @@
 
   <!-- POST -->
   {% if post.cover %}
-    <div class="mb-6">
-      <img src="{{ post.cover.url }}" alt="Imagen de portada" class="w-full h-auto rounded-lg shadow-sm">
-    </div>
+  <div class="mb-6">
+    <img src="{{ post.cover.url }}" alt="Imagen de portada" class="w-full h-auto rounded-lg shadow-sm">
+  </div>
   {% endif %}
 
   {% if post.abstract %}
-    <p class="text-base text-gray-500 leading-relaxed mb-6 italic">{{ post.abstract|linebreaks }}</p>
+  <p class="text-base text-gray-500 leading-relaxed mb-6 italic">{{ post.abstract|linebreaks }}</p>
   {% endif %}
 
   <hr class="border-gray-200 my-6">
 
-  <article>
-    <p class="text-lg text-gray-700 leading-relaxed whitespace-pre-line">{{ post.body }}</p>
+  <article class="prose prose-lg prose-gray max-w-none">
+    {{ post.body|safe }}
   </article>
+
 
   <div class="flex justify-between items-center text-sm text-gray-400 mt-8">
     <span>Publicado el {{ post.creation_date|date:"d M Y" }}</span>
     {% if post.author %}
-      <span>por {{ post.author.username }}</span>
+    <span>por {{ post.author.username }}</span>
     {% endif %}
   </div>
 </div>
@@ -105,90 +146,87 @@
 <!-- COMENTARIOS -->
 <div id="comentarios" class="max-w-3xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
   {% if request.user.is_authenticated %}
-    <h2 class="text-xl font-semibold mb-4">💬 Comentarios</h2>
+  <h2 class="text-xl font-semibold mb-4">💬 Comentarios</h2>
 
-    <form method="post" id="comment-form" data-post-id="{{ post.id }}" class="mt-6">
-      {% csrf_token %}
-      {{ comment_form.content }}
-      <button type="submit" class="mt-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-5 py-2 rounded transition">
-        Enviar
-      </button>
-    </form>
+  <form method="post" id="comment-form" data-post-id="{{ post.id }}" class="mt-6">
+    {% csrf_token %}
+    {{ comment_form.content }}
+    <button type="submit"
+      class="mt-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-5 py-2 rounded transition">
+      Enviar
+    </button>
+  </form>
 
   {% else %}
-    <span class="text-gray-500 italic">🔒 
-      <a href="{% url 'login' %}" class="text-blue-500 underline">Inicia sesión</a> para dejar un comentario
-    </span>
+  <span class="text-gray-500 italic">🔒
+    <a href="{% url 'login' %}" class="text-blue-500 underline">Inicia sesión</a> para dejar un comentario
+  </span>
   {% endif %}
 
   {% if comments %}
   <div class="p-3 mt-6 max-h-96 overflow-y-auto border border-gray-200 rounded">
     <ul id="comment-list" class="space-y-2 mt-6">
       {% for comment in comments %}
-        <li class="border-b pb-2" id="comment-{{ comment.id }}">
-          <div class="flex justify-between items-center text-sm text-gray-700 pb-3">
-            <p><strong>{{ comment.user }}</strong> dijo:</p>
-            <div class="flex flex-col text-right">
-              <span class="text-xs text-gray-500 italic">
-                Publicado: {{ comment.created_at|date:"d/m/Y - H:i" }}
-              </span>
+      <li class="border-b pb-2" id="comment-{{ comment.id }}">
+        <div class="flex justify-between items-center text-sm text-gray-700 pb-3">
+          <p><strong>{{ comment.user }}</strong> dijo:</p>
+          <div class="flex flex-col text-right">
+            <span class="text-xs text-gray-500 italic">
+              Publicado: {{ comment.created_at|date:"d/m/Y - H:i" }}
+            </span>
 
-              {% if comment.updated_at|date:"U" > comment.created_at|date:"U" %}
-                <span class="text-xs text-gray-500 italic"
-                      id="edited-{{ comment.id }}">
-                  Editado: {{ comment.updated_at|date:"d/m/Y - H:i" }}
-                </span>
-              {% else %}
-                <span class="text-xs text-gray-500 italic hidden"
-                      id="edited-{{ comment.id }}">
-                </span>
-              {% endif %}
-            </div>
+            {% if comment.updated_at|date:"U" > comment.created_at|date:"U" %}
+            <span class="text-xs text-gray-500 italic" id="edited-{{ comment.id }}">
+              Editado: {{ comment.updated_at|date:"d/m/Y - H:i" }}
+            </span>
+            {% else %}
+            <span class="text-xs text-gray-500 italic hidden" id="edited-{{ comment.id }}">
+            </span>
+            {% endif %}
           </div>
+        </div>
 
-          <!-- Contenido del comentario -->
-          <p class="text-sm text-gray-900 max-h-20 break-words" id="content-{{ comment.id }}">{{ comment.content }}</p>
+        <!-- Contenido del comentario -->
+        <p class="text-sm text-gray-900 max-h-20 break-words" id="content-{{ comment.id }}">{{ comment.content }}</p>
 
-          <!-- Textarea oculta para edición -->
-          <textarea
-            id="edit-{{ comment.id }}"
-            class="w-full text-sm text-gray-900 border border-gray-300 rounded p-2 mt-2"
-            style="display:none;"
-          >{{ comment.content }}</textarea>
+        <!-- Textarea oculta para edición -->
+        <textarea id="edit-{{ comment.id }}"
+          class="w-full text-sm text-gray-900 border border-gray-300 rounded p-2 mt-2"
+          style="display:none;">{{ comment.content }}
+        </textarea>
 
-          {% if comment.user == request.user %}
-            <div class="flex gap-2 mt-2">
-              <!-- Botón para activar edición -->
-              <button
-                data-id="{{ comment.id }}"
-                class="edit-btn text-sm text-blue-500 hover:underline"
-              >Editar</button>
 
-              <!-- Botón para guardar edición -->
-              <button
-                id="save-{{ comment.id }}"
-                data-id="{{ comment.id }}"
-                class="save-btn text-sm text-green-500 hover:underline"
-                style="display:none;"
-              >Guardar</button>
-            </div>
+        <!-- BOTONES -->
+        <div class="flex gap-2 mt-2">
+          {% if request.user.profile.is_moderador or request.user.profile.is_admin%}
+            <!-- Botón para eliminar -->
+            <button id="delete-{{ comment.id }}" data-id="{{ comment.id }}"
+              class="delete-btn text-sm text-red-500 hover:underline">
+              Eliminar
+            </button>
+          {% elif comment.user == request.user %}
+            <!-- Botón para activar edición -->
+            <button data-id="{{ comment.id }}" class="edit-btn text-sm text-blue-500 hover:underline">Editar</button>
+
+            <!-- Botón para guardar edición -->
+            <button id="save-{{ comment.id }}" data-id="{{ comment.id }}"
+              class="save-btn text-sm text-green-500 hover:underline" style="display:none;">Guardar</button>
           {% endif %}
-        </li>
+        </div>
+
+      </li>
       {% endfor %}
     </ul>
 
-      {% if has_next %}
-        <button id="load-more" data-next="{{ next_page }}" class="mt-2 text-blue-500 hover:underline">
-          Ver más comentarios
-        </button>
-      {% endif %}
+    {% if has_next %}
+    <button id="load-more" data-next="{{ next_page }}" class="mt-2 text-blue-500 hover:underline">
+      Ver más comentarios
+    </button>
+    {% endif %}
   </div>
   {% endif %}
 </div>
 
-  <script src="{% static 'js/like_button.js' %}"></script>
-  <script src="{% static 'js/see_more_comments.js' %}"></script>
-  <script src="{% static 'js/comment_edit.js' %}"></script>
-  <script src="{% static 'js/comment_create.js' %}"></script>
+<script type="module" src="{% static 'js/main.js' %}"></script>
 
 {% endblock %}

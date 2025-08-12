@@ -1,11 +1,17 @@
+import { showAlert } from './utils.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   const loadMoreBtn = document.getElementById("load-more");
   if (!loadMoreBtn) return;
 
   loadMoreBtn.addEventListener("click", () => {
     const nextPage = loadMoreBtn.dataset.next;
+
     fetch(`?page=${nextPage}`)
-      .then(response => response.text())
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        return response.text();
+      })
       .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
@@ -20,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           loadMoreBtn.remove(); // Ya no hay más comentarios
         }
+      })
+      .catch(error => {
+        console.error("Error al cargar más comentarios:", error);
+        showAlert("No se pudieron cargar más comentarios.");
       });
   });
 });

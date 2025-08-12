@@ -2,42 +2,112 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+
+    {% block css %} {% endblock %}
+
     <title>{% block title %}Blog{% endblock %}</title>
 </head>
+
 <body class="bg-gray-100 text-gray-800 font-sans">
-
     <!-- Encabezado principal -->
-    <header class="bg-white shadow px-4 py-3 flex items-center justify-between">
-        <div class="text-lg font-semibold">Mi Blog</div>
+    <header class="relative bg-white shadow px-6 py-4 flex items-center justify-between">
+        <!-- Botón hamburguesa (izquierda) -->
+        <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-        <div class="flex items-center gap-4">
+        <!-- Navegación principal -->
+        <nav id="mobile-menu"
+            class="hidden md:flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-gray-700 absolute top-full left-0 bg-white px-6 py-4 md:static md:bg-transparent md:px-0 md:py-0 z-40 shadow-md md:shadow-none transition-all duration-300 ease-in-out">
+
+            <!-- Título dentro del menú en móviles -->
+            <div class="md:hidden text-lg font-bold text-gray-800">
+                <a href="{% url 'index' %}" class="hover:text-blue-600 transition">Mi Blog</a>
+            </div>
+
+            <a href="{% url 'index' %}" class="hover:text-blue-600">Inicio</a>
+            <a href="{% url 'posts:list' %}" class="hover:text-blue-600">Posts</a>
+
+            <!-- Dropdown de categorías -->
+            <div class="relative" id="category-menu-container">
+                <button id="category-menu-button"
+                    class="flex items-center gap-1 hover:text-blue-600 focus:outline-none">
+                    Categorías
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div id="category-menu" class="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg hidden z-50">
+                    {% for category in categories %}
+                    <a href="{% url 'posts:posts_by_category' category.slug %}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        {{ category.name }}
+                    </a>
+                    {% empty %}
+                    <span class="block px-4 py-2 text-sm text-gray-500">Sin categorías</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </nav>
+
+        <!-- Usuario autenticado o no -->
+        <div class="relative" id="user-menu-container">
             {% if user.is_authenticated %}
-                <span class="text-sm">Hola, <a href="{% url 'profile_view' %}" class="hover:underline">{{ user.username }}</a> 👋</span>
+            <!-- Botón de usuario -->
+            <button id="user-menu-button" class="flex items-center gap-2 focus:outline-none">
+                <img src="{{ user.profile.avatar.url }}" alt="Avatar"
+                    class="w-8 h-8 rounded-full object-cover border" />
+                <span class="text-sm font-medium text-gray-800">{{ user.username }}</span>
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Menú desplegable -->
+            <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg hidden z-50">
+                <a href="{% url 'profile_view' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤
+                    Perfil</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Configuración</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Mis posts</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-                        Cerrar sesión
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                        🚪 Cerrar sesión
                     </button>
                 </form>
+            </div>
             {% else %}
-                <a href="{% url 'login' %}" class="text-blue-600 hover:underline text-sm">Iniciar sesión</a>
-                <a href="{% url 'signup' %}" class="text-blue-600 hover:underline text-sm">Registrarse</a>
+            <!-- Botones para usuarios no autenticados -->
+            <div class="flex gap-3">
+                <a href="{% url 'login' %}"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm font-medium">
+                    Iniciar sesión
+                </a>
+                <a href="{% url 'signup' %}"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-sm font-medium">
+                    Registrarse
+                </a>
+            </div>
             {% endif %}
         </div>
     </header>
-
     <!-- Cuerpo -->
     <main class="max-w-3xl mx-auto mt-8 px-4 pb-12">
-        {% block content %}
-        
-        {% endblock %}
+        {% block content %} {% endblock %}
     </main>
 </body>
+
+<script src="{% static 'js/menu-toggle.js' %}"></script>
+
 </html>
