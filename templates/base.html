@@ -78,7 +78,7 @@
             <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg hidden z-50">
                 <a href="{% url 'profile_view' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤
                     Perfil</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Configuración</a>
+                <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Configuración</a>
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Mis posts</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

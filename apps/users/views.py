@@ -33,9 +33,18 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = Profile
     form_class = ProfileEditForm
     template_name = 'edit_profile.html'
-    success_url = reverse_lazy('user:profile_view') 
+    success_url = reverse_lazy('profile_view') 
 
     def get_object(self, queryset=None):
         # Asegura que el usuario solo edite su propio perfil
         return self.request.user.profile
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if form.has_changed():
+                messages.success(self.request, '✅ Cambios guardados correctamente.')
+        else:
+            messages.info(self.request, 'No se realizaron cambios.')
+        return response
+
 
