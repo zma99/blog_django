@@ -1,5 +1,11 @@
 from django.views.generic import TemplateView
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.urls import reverse_lazy
+
+from apps.users.models import Profile
+from apps.users.forms.profileEditForm import ProfileEditForm
 
 class ProfileView(TemplateView):
     template_name = 'profile_view.html'
@@ -23,23 +29,13 @@ class ProfileView(TemplateView):
         return context
 
 
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = Profile
+    form_class = ProfileEditForm
+    template_name = 'edit_profile.html'
+    success_url = reverse_lazy('user:profile_view') 
 
-# class ProfileView(TemplateView):
-#     template_name = 'profile_view.html'
+    def get_object(self, queryset=None):
+        # Asegura que el usuario solo edite su propio perfil
+        return self.request.user.profile
 
-#     def get(self, request, *args, **kwargs):
-#         profile = request.user.profile
-
-#         if profile.requested_editor and profile.rol == 'reader':
-#             messages.info(request, "Tu solicitud para ser editor está pendiente de aprobación.")
-#         elif profile.requested_editor and profile.rol == 'editor':
-#             messages.success(request, "¡Tu rol de editor ha sido aprobado!")
-#             profile.requested_editor = False
-#             profile.save()
-
-#         return super().get(request, *args, **kwargs)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['profile'] = self.request.user.profile
-#         return context
