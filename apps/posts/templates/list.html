@@ -51,6 +51,10 @@
   <div>
     <button type="submit"
       class="bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700 transition">Aplicar filtros</button>
+    <a href="{% url 'posts:list' %}"
+      class="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+      Limpiar filtros
+    </a>
   </div>
 </form>
 
@@ -66,7 +70,8 @@
       <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
     </h2>
 
-    <div class="flex items-center text-sm text-gray-500 mb-2 gap-4">
+    <div class="flex items-center justify-start text-sm text-gray-500 mb-2 gap-4">
+      <span class="text-sm text-black bg-green-300 rounded-lg py-1 px-3 hover:bg-green-500 hover:shadow"> {{ post.category.name }} </span>
       <span>👤 {{ post.author.username }}</span>
       <span>📅 {{ post.creation_date|date:"d M Y" }}</span>
       <span>👁️ {{ post.views }} Visita{{ post.views|pluralize }}</span>
@@ -85,21 +90,16 @@
   {% endfor %}
 </section>
 
-<!-- Paginación con filtros persistentes -->
 {% if is_paginated %}
 <nav class="flex items-center justify-center gap-4 mt-10 text-sm">
   {% if page_obj.has_previous %}
-  <a href="?{% if selected_author %}author={{ selected_author }}&{% endif %}
-            {% if selected_order %}order={{ selected_order }}&{% endif %}
-            page={{ page_obj.previous_page_number }}"
-    class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">← Anterior</a>
+    <a href="?{% if selected_order %}order={{ selected_order }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.previous_page_number }}"
+       class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">← Anterior</a>
   {% endif %}
   <span class="text-gray-700">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
   {% if page_obj.has_next %}
-  <a href="?{% if selected_author %}author={{ selected_author }}&{% endif %}
-            {% if selected_order %}order={{ selected_order }}&{% endif %}
-            page={{ page_obj.next_page_number }}"
-    class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Siguiente →</a>
+    <a href="?{% if selected_order %}order={{ selected_order }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.next_page_number }}"
+       class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Siguiente →</a>
   {% endif %}
 </nav>
 {% endif %}
