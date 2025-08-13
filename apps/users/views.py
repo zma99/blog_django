@@ -1,11 +1,17 @@
 from django.views.generic import TemplateView
+from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from apps.users.models import Profile
 from apps.users.forms.profileEditForm import ProfileEditForm
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.posts.models import Post
+from apps.users.models import Profile
+
+
 
 class ProfileView(TemplateView):
     template_name = 'profile_view.html'
@@ -46,5 +52,16 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         else:
             messages.info(self.request, 'No se realizaron cambios.')
         return response
+    
+
+
+class UserPostsView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'user_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).order_by('-creation_date')
 
 

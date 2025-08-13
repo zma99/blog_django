@@ -84,7 +84,7 @@
                 <a href="{% url 'profile_view' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤
                     Perfil</a>
                 <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Configuración</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Mis posts</a>
+                <a href="{% url 'user_posts' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Mis posts</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
