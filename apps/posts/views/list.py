@@ -1,5 +1,6 @@
 from django.views.generic.list import ListView
-from apps.posts.models import Post, Category
+from django.db.models import Count
+from apps.posts.models import Post, Category, User
 
 class PostListView(ListView):
     model = Post
@@ -8,16 +9,52 @@ class PostListView(ListView):
     paginate_by = 4
 
     def get_queryset(self):
-        slug = self.kwargs.get('slug')
-        queryset = Post.objects.all().order_by('-creation_date')
+        slug = self.kwargs.get('slug')  # categoría por slug
+        order = self.request.GET.get('order', 'recent')  # orden por defecto
+        category_slug = self.request.GET.get('category')
+
+        queryset = Post.objects.all()
+
+        # Filtro por categoría (slug en URL)
         if slug:
             queryset = queryset.filter(category__slug=slug)
+
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
+        # Ordenamiento
+        if order == 'views':
+            queryset = queryset.order_by('-views')
+        elif order == 'likes':
+            queryset = queryset.order_by('-likes')
+        elif order == 'comments':
+            queryset = queryset.annotate(num_comments=Count('comments')).order_by('-num_comments')
+        elif order == 'recent':
+            queryset = queryset.order_by('-creation_date')
+        elif order == 'oldest':
+            queryset = queryset.order_by('creation_date')
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        category_slug = self.request.GET.get('category')
         slug = self.kwargs.get('slug')
+
         if slug:
             category = Category.objects.filter(slug=slug).first()
             context['current_category'] = category.name if category else slug
+
+        context['selected_category'] = category_slug
+        context['selected_order'] = self.request.GET.get('order', 'recent')
+        context['order_options'] = [
+            ('recent', 'Más reciente'),
+            ('oldest', 'Más antiguo'),
+            ('views', 'Más visitas'),
+            ('likes', 'Más gustados'),
+            ('comments', 'Más comentados'),
+        ]
+        context['categories'] = Category.objects.all()
+
         return context
