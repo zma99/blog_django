@@ -1,6 +1,6 @@
 from django.views.generic.list import ListView
-from django.db.models import Count
-from apps.posts.models import Post, Category, User
+from django.db.models import Count, Q
+from apps.posts.models import Post, Category
 
 class PostListView(ListView):
     model = Post
@@ -12,6 +12,7 @@ class PostListView(ListView):
         slug = self.kwargs.get('slug')  # categoría por slug
         order = self.request.GET.get('order', 'recent')  # orden por defecto
         category_slug = self.request.GET.get('category')
+        search_query = self.request.GET.get('q')    # Búsqeuda de posts
 
         queryset = Post.objects.all()
 
@@ -33,6 +34,13 @@ class PostListView(ListView):
             queryset = queryset.order_by('-creation_date')
         elif order == 'oldest':
             queryset = queryset.order_by('creation_date')
+
+        if search_query:
+            queryset = queryset.filter(
+            Q(title__icontains=search_query) |
+            Q(body__icontains=search_query) |
+            Q(author__username__icontains=search_query)
+        )
 
         return queryset
 
@@ -56,5 +64,6 @@ class PostListView(ListView):
             ('comments', 'Más comentados'),
         ]
         context['categories'] = Category.objects.all()
+        context['search_query'] = self.request.GET.get('q', '')
 
         return context
