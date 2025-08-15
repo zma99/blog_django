@@ -1,28 +1,76 @@
-{% extends 'base.html' %} 
-{% block title %} Inicio {% endblock %} 
+{% extends 'base.html' %}
+{% block title %} Inicio {% endblock %}
 
 {% block content %}
+<section class="py-10 px-6 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow">
+  <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">✨ Lo más destacado</h2>
 
-<div class="text-center py-8">
-  <h1 class="text-3xl font-bold mb-4">Bienvenido a la plataforma</h1>
-  <p class="text-gray-600">
-    Explorá los contenidos, categorías y usuarios activos.
-  </p>
-</div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-  <div class="bg-white shadow rounded p-4">
-    <h2 class="text-xl font-semibold">Posts publicados</h2>
-    <p class="text-2xl">{{ total_posts }}</p>
-  </div>
-  <div class="bg-white shadow rounded p-4">
-    <h2 class="text-xl font-semibold">Categorías</h2>
-    <p class="text-2xl">{{ total_categories }}</p>
-  </div>
-  <div class="bg-white shadow rounded p-4">
-    <h2 class="text-xl font-semibold">Usuarios registrados</h2>
-    <p class="text-2xl">{{ total_users }}</p>
-  </div>
-</div>
+    <!-- 🏆 Categoría destacada -->
+    <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-t-4 border-blue-500 flex flex-col justify-between h-full">
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-blue-500 text-2xl">🏆</span>
+          <h3 class="text-lg font-semibold text-gray-800">Categoría destacada</h3>
+        </div>
+        {% if top_category %}
+          <p class="text-gray-600 mb-3">La categoría con más publicaciones es <strong>{{ top_category.name }}</strong>.</p>
+        {% else %}
+          <p class="text-gray-500">No hay categorías destacadas aún.</p>
+        {% endif %}
+      </div>
+      {% if top_category %}
+        <div class="mt-4">
+          <a href="{% url 'posts:posts_by_category' top_category.slug %}" class="text-blue-600 hover:underline text-sm font-medium">Ver posts →</a>
+        </div>
+      {% endif %}
+    </div>
 
+    <!-- 🔥 Post más popular -->
+    <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-t-4 border-red-500 flex flex-col justify-between h-full">
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-red-500 text-2xl">🔥</span>
+          <h3 class="text-lg font-semibold text-gray-800">Post más popular</h3>
+        </div>
+        {% if most_viewed_post %}
+          <h4 class="text-md font-bold text-gray-900 mb-2">{{ most_viewed_post.title }}</h4>
+          <p class="text-sm text-gray-600 mb-3">{{ most_viewed_post.abstract }}</p>
+          <div class="text-xs text-gray-500 mb-2">👁️ {{ most_viewed_post.views }} vistas</div>
+        {% else %}
+          <p class="text-gray-500">No hay posts populares aún.</p>
+        {% endif %}
+      </div>
+      {% if most_viewed_post %}
+        <div class="mt-4">
+          <a href="{% url 'posts:detail' most_viewed_post.pk %}" class="text-red-600 hover:underline text-sm font-medium">Leer más →</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 🕒 Último post publicado -->
+    <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-t-4 border-green-500 flex flex-col justify-between h-full">
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-green-500 text-2xl">🕒</span>
+          <h3 class="text-lg font-semibold text-gray-800">Último post publicado</h3>
+        </div>
+        {% if latest_post %}
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ latest_post.title }}</h3>
+          <p class="text-sm text-gray-600 mb-3">{{ latest_post.abstract }}</p>
+          <p class="text-xs text-gray-500">📅 {{ latest_post.published_date|date:"d M Y" }}</p>
+        {% else %}
+          <p class="text-gray-500">Aún no se ha publicado ningún post.</p>
+        {% endif %}
+      </div>
+      {% if latest_post %}
+        <div class="mt-4">
+          <a href="{% url 'posts:detail' latest_post.pk %}" class="text-green-600 hover:underline text-sm font-medium">Leer más →</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
 {% endblock %}
